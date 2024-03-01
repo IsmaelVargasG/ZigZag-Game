@@ -468,6 +468,7 @@ MonoBehaviour:
   camara: {fileID: 1771511386}
   suelo: {fileID: 2385824377574116604, guid: 84268aa2ea37c744e8768427e492a02d, type: 3}
   moneda: {fileID: 1943990248497684795, guid: 9fbd2e1a03ea79c4fb2047b718dfc355, type: 3}
+  obstaculo: {fileID: 5392530783949289039, guid: 3ffca99078cfaae4f8ae62f720afd4ee, type: 3}
   velocidad: 10
   Contador: {fileID: 2137957701}
   Puntuacion: 0

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class JugadorBola : MonoBehaviour
@@ -9,6 +9,7 @@ public class JugadorBola : MonoBehaviour
     public Camera camara;
     public GameObject suelo;
     public GameObject moneda;
+    public GameObject obstaculo;
     public float velocidad = 5.0f;
     public TextMeshProUGUI Contador;
     public int Puntuacion = 0;
@@ -66,10 +67,17 @@ public class JugadorBola : MonoBehaviour
             Contador.text = "SCORE: " + Puntuacion;
             Destroy(other.gameObject);
         }
+
+        if(other.gameObject.CompareTag("Obstaculo")){
+            SceneManager.LoadScene("Nivel1");
+        }
     }
 
     IEnumerator BorrarSuelo(GameObject sueloC){
         float aleatorio = Random.Range(0.0f, 1.0f);
+        float monX = Random.Range(-2.0f, 2.0f);
+        float monZ = Random.Range(-2.0f, 2.0f);
+
         if(aleatorio > 0.5){
             ValX += 6.0f;
         }
@@ -77,9 +85,16 @@ public class JugadorBola : MonoBehaviour
             ValZ += 6.0f;
         }
 
-        
+        aleatorio = Random.Range(0.0f, 1.0f);
+
         Instantiate(suelo, new Vector3(ValX, 0, ValZ), Quaternion.identity);
-        Instantiate(moneda, new Vector3(ValX, 1, ValZ), moneda.transform.rotation);
+        if(aleatorio > 0.5){
+            Instantiate(moneda, new Vector3(ValX+monX, 1, ValZ+monZ), moneda.transform.rotation);
+        }
+        else{
+            Instantiate(obstaculo, new Vector3(ValX+monX, 1, ValZ+monZ), Quaternion.identity);
+        }
+
         yield return new WaitForSeconds(0.1f);
         sueloC.gameObject.GetComponent<Rigidbody>().isKinematic = false;
         sueloC.gameObject.GetComponent<Rigidbody>().useGravity = true;
