@@ -12,13 +12,17 @@ public class JugadorBola : MonoBehaviour
     public GameObject obstaculo;
     public float velocidad = 5.0f;
     public TextMeshProUGUI Contador;
+    public TextMeshProUGUI Vidas_texto;
     public int Puntuacion = 0;
+    
 
     private Vector3 offset;
     private float ValX, ValZ;
     private Vector3 DireccionActual;
     private float altura;
     private Vector3 rotacion;
+    private static int vidas = 3;
+    private float caidaRaycast = 3.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -28,6 +32,7 @@ public class JugadorBola : MonoBehaviour
         DireccionActual = Vector3.forward;
         altura = transform.position.y;
         rotacion = transform.eulerAngles;
+        Vidas_texto.text = "x " + vidas;
     }
 
     // Update is called once per frame
@@ -42,6 +47,9 @@ public class JugadorBola : MonoBehaviour
             transform.position = new Vector3(transform.position.x, altura, transform.position.z);
         }
         transform.eulerAngles = rotacion;
+        if(ComprobarCaida()){
+            StartCoroutine(ResetearNivel());
+        }
     }
 
     void CrearSueloInicial(){
@@ -70,6 +78,10 @@ public class JugadorBola : MonoBehaviour
 
         if(other.gameObject.CompareTag("Obstaculo")){
             SceneManager.LoadScene("Nivel1");
+            if (vidas > 0){
+                --vidas;
+                Debug.Log("Vidas: " + vidas);
+            }
         }
     }
 
@@ -102,12 +114,35 @@ public class JugadorBola : MonoBehaviour
         Destroy(sueloC);
     }
 
+    IEnumerator ResetearNivel(){
+        yield return new WaitForSeconds(1.0f);
+        if(vidas > 0){
+                --vidas;
+                Debug.Log("Vidas: " + vidas);
+        }
+        SceneManager.LoadScene("Nivel1");
+    }
+
     void CambiarDireccion(){
         if(DireccionActual == Vector3.forward){
             DireccionActual = Vector3.right;
         }
         else{
             DireccionActual = Vector3.forward;
+        }
+    }
+
+    private bool ComprobarCaida(){
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, caidaRaycast))
+        {
+            // Si el raycast golpea algo, no estamos cayendo
+            return false;
+        }
+        else
+        {
+            // Si el raycast no golpea nada, estamos cayendo
+            return true;
         }
     }
 }
