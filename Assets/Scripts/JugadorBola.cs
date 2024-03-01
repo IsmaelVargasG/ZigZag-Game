@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class JugadorBola : MonoBehaviour
 {
     public Camera camara;
     public GameObject suelo;
+    public GameObject moneda;
     public float velocidad = 5.0f;
+    public TextMeshProUGUI Contador;
+    public int Puntuacion = 0;
 
     private Vector3 offset;
     private float ValX, ValZ;
@@ -46,9 +51,20 @@ public class JugadorBola : MonoBehaviour
     }
 
     private void OnCollisionExit(Collision other){
-    
         if(other.gameObject.tag == "Suelo"){
             StartCoroutine(BorrarSuelo(other.gameObject));
+        }
+    }
+
+    void OnBecameInvisible(){
+        Destroy(gameObject);
+    }
+
+    void OnTriggerEnter(Collider other){
+        if(other.gameObject.CompareTag("Moneda")){
+            Puntuacion += 10;
+            Contador.text = "SCORE: " + Puntuacion;
+            Destroy(other.gameObject);
         }
     }
 
@@ -63,6 +79,7 @@ public class JugadorBola : MonoBehaviour
 
         
         Instantiate(suelo, new Vector3(ValX, 0, ValZ), Quaternion.identity);
+        Instantiate(moneda, new Vector3(ValX, 1, ValZ), moneda.transform.rotation);
         yield return new WaitForSeconds(0.1f);
         sueloC.gameObject.GetComponent<Rigidbody>().isKinematic = false;
         sueloC.gameObject.GetComponent<Rigidbody>().useGravity = true;
