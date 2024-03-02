@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+
 public class JugadorBola : MonoBehaviour
 {
     public Camera camara;
@@ -16,17 +17,19 @@ public class JugadorBola : MonoBehaviour
     public int Puntuacion = 0;
     
 
-    private Vector3 offset;
+    private UnityEngine.Vector3 offset;
     private float ValX, ValZ;
     private Vector3 DireccionActual;
     private float altura;
     private Vector3 rotacion;
     private static int vidas = 3;
     private float caidaRaycast = 3.0f;
+    private Queue<Vector3> posicion_suelo;
 
     // Start is called before the first frame update
     void Start()
     {
+        posicion_suelo = new Queue<Vector3>();
         offset = camara.transform.position - transform.position;
         CrearSueloInicial();
         DireccionActual = Vector3.forward;
@@ -47,8 +50,8 @@ public class JugadorBola : MonoBehaviour
             transform.position = new Vector3(transform.position.x, altura, transform.position.z);
         }
         transform.eulerAngles = rotacion;
-        if(ComprobarCaida()){
-            StartCoroutine(ResetearNivel());
+        if(HaCaido()){
+            ResetearPosicion();
         }
     }
 
@@ -56,12 +59,14 @@ public class JugadorBola : MonoBehaviour
         for(int i = 0; i < 3; i++){
             ValZ += 6.0f;
             Instantiate(suelo, new Vector3(ValX, 0, ValZ), Quaternion.identity);
+            posicion_suelo.Enqueue(new Vector3(ValX, 0, ValZ));
         }
     }
 
     private void OnCollisionExit(Collision other){
         if(other.gameObject.tag == "Suelo"){
             StartCoroutine(BorrarSuelo(other.gameObject));
+            posicion_suelo.Dequeue();
         }
     }
 
@@ -77,11 +82,12 @@ public class JugadorBola : MonoBehaviour
         }
 
         if(other.gameObject.CompareTag("Obstaculo")){
-            SceneManager.LoadScene("Nivel1");
+            /* SceneManager.LoadScene("Nivel1");
             if (vidas > 0){
                 --vidas;
                 Debug.Log("Vidas: " + vidas);
-            }
+            } */
+            ResetearPosicion();
         }
     }
 
@@ -98,7 +104,7 @@ public class JugadorBola : MonoBehaviour
         }
 
         aleatorio = Random.Range(0.0f, 1.0f);
-
+        posicion_suelo.Enqueue(new Vector3(ValX, 0, ValZ));
         Instantiate(suelo, new Vector3(ValX, 0, ValZ), Quaternion.identity);
         if(aleatorio > 0.5){
             Instantiate(moneda, new Vector3(ValX+monX, 1, ValZ+monZ), moneda.transform.rotation);
@@ -114,13 +120,16 @@ public class JugadorBola : MonoBehaviour
         Destroy(sueloC);
     }
 
-    IEnumerator ResetearNivel(){
-        yield return new WaitForSeconds(1.0f);
+    private void ResetearPosicion(){
         if(vidas > 0){
                 --vidas;
                 Debug.Log("Vidas: " + vidas);
         }
-        SceneManager.LoadScene("Nivel1");
+        Vector3 siguiente = posicion_suelo.Peek();
+        transform.position = new Vector3(siguiente.x, altura, siguiente.z);
+        transform.eulerAngles = rotacion;
+        DireccionActual = Vector3.forward;
+        //SceneManager.LoadScene("Nivel1");
     }
 
     void CambiarDireccion(){
@@ -132,7 +141,7 @@ public class JugadorBola : MonoBehaviour
         }
     }
 
-    private bool ComprobarCaida(){
+    private bool HaCaido(){
         RaycastHit hit;
         if (Physics.Raycast(transform.position, Vector3.down, out hit, caidaRaycast))
         {
