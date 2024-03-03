@@ -15,16 +15,20 @@ public class JugadorBola : MonoBehaviour
     public TextMeshProUGUI Contador;
     public TextMeshProUGUI Vidas_texto;
     public int Puntuacion = 0;
+    public Material daño;
+    public GameObject pauseMenuUI;
+    public GameObject overMenuUI;
     
 
-    private UnityEngine.Vector3 offset;
+    private Material normal;
+    private Vector3 offset;
     private float ValX, ValZ;
     private Vector3 DireccionActual;
     private float altura;
     private Vector3 rotacion;
-    private static int vidas = 3;
-    private float caidaRaycast = 3.0f;
+    private int vidas = 3;
     private Queue<Vector3> posicion_suelo;
+    private int nivel2 = 200;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +40,7 @@ public class JugadorBola : MonoBehaviour
         altura = transform.position.y;
         rotacion = transform.eulerAngles;
         Vidas_texto.text = "x " + vidas;
+        normal = GetComponent<Renderer>().material;
     }
 
     // Update is called once per frame
@@ -45,13 +50,24 @@ public class JugadorBola : MonoBehaviour
         if(Input.GetKeyUp(KeyCode.Space)){
             CambiarDireccion();
         }
+        if(Input.GetKeyUp(KeyCode.P)){
+            PauseGame();
+        }
+
         transform.Translate(DireccionActual * velocidad * Time.deltaTime);
         if(transform.position.y > altura){
             transform.position = new Vector3(transform.position.x, altura, transform.position.z);
         }
         transform.eulerAngles = rotacion;
-        if(HaCaido()){
-            ResetearPosicion();
+        if(transform.position.y < altura - 2){
+            if(vidas > 1){
+                --vidas;
+                Vidas_texto.text = "x " + vidas;
+                ResetearPosicion();
+            }
+            else{
+                GameOver();
+            }
         }
     }
 
@@ -82,13 +98,22 @@ public class JugadorBola : MonoBehaviour
         }
 
         if(other.gameObject.CompareTag("Obstaculo")){
-            /* SceneManager.LoadScene("Nivel1");
-            if (vidas > 0){
+            other.gameObject.GetComponent<Collider>().enabled = false;
+            StartCoroutine(cambiarColor());
+            if(vidas > 1){
                 --vidas;
-                Debug.Log("Vidas: " + vidas);
-            } */
-            ResetearPosicion();
+                Vidas_texto.text = "x " + vidas;
+            }
+            else{
+                GameOver();
+            }
         }
+    }
+
+    IEnumerator cambiarColor(){
+        GetComponent<Renderer>().material = daño;
+        yield return new WaitForSeconds(0.2f);
+        GetComponent<Renderer>().material = normal;
     }
 
     IEnumerator BorrarSuelo(GameObject sueloC){
@@ -109,7 +134,7 @@ public class JugadorBola : MonoBehaviour
         if(aleatorio > 0.5){
             Instantiate(moneda, new Vector3(ValX+monX, 1, ValZ+monZ), moneda.transform.rotation);
         }
-        else{
+        else if(Puntuacion >= nivel2){
             Instantiate(obstaculo, new Vector3(ValX+monX, 1, ValZ+monZ), Quaternion.identity);
         }
 
@@ -121,15 +146,15 @@ public class JugadorBola : MonoBehaviour
     }
 
     private void ResetearPosicion(){
-        if(vidas > 0){
-                --vidas;
-                Debug.Log("Vidas: " + vidas);
-        }
         Vector3 siguiente = posicion_suelo.Peek();
         transform.position = new Vector3(siguiente.x, altura, siguiente.z);
         transform.eulerAngles = rotacion;
-        DireccionActual = Vector3.forward;
-        //SceneManager.LoadScene("Nivel1");
+        if(Physics.CheckSphere(new Vector3(siguiente.x + 6, altura, siguiente.z), 1f)){
+            DireccionActual = Vector3.right;
+        }
+        else{
+            DireccionActual = Vector3.forward;
+        }
     }
 
     void CambiarDireccion(){
@@ -141,17 +166,13 @@ public class JugadorBola : MonoBehaviour
         }
     }
 
-    private bool HaCaido(){
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, caidaRaycast))
-        {
-            // Si el raycast golpea algo, no estamos cayendo
-            return false;
-        }
-        else
-        {
-            // Si el raycast no golpea nada, estamos cayendo
-            return true;
-        }
+    void PauseGame(){
+        pauseMenuUI.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    void GameOver(){
+        overMenuUI.SetActive(true);
+        Time.timeScale = 0f;
     }
 }
