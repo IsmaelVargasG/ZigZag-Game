@@ -14,6 +14,7 @@ public class JugadorBola : MonoBehaviour
     public float velocidad = 5.0f;
     public TextMeshProUGUI Contador;
     public TextMeshProUGUI Vidas_texto;
+    public TextMeshProUGUI NivelActual;
     public int Puntuacion = 0;
     public Material daño;
     public GameObject pauseMenuUI;
@@ -68,6 +69,10 @@ public class JugadorBola : MonoBehaviour
             else{
                 GameOver();
             }
+        }
+
+        if(Puntuacion == nivel2){
+            NivelActual.text = "Nivel 2";
         }
     }
 
