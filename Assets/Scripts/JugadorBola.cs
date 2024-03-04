@@ -121,11 +121,17 @@ public class JugadorBola : MonoBehaviour
         if(other.gameObject.CompareTag("Moneda")){
             Puntuacion += 10;
             Contador.text = "SCORE: " + Puntuacion;
-            Destroy(other.gameObject);
+            AudioSource sonido = other.GetComponent<AudioSource>();
+            sonido.Play();
+            other.GetComponent<MeshRenderer>().enabled = false;
+            // Aqui hago dos Destroy para eliminar el object que existe tambien en la variable sonido
+            Destroy(sonido.gameObject, sonido.clip.length);
+            Destroy(other.gameObject, sonido.clip.length);  
         }
 
         if(other.gameObject.CompareTag("Obstaculo")){
             other.gameObject.GetComponent<Collider>().enabled = false;
+            other.GetComponent<AudioSource>().Play();
             StartCoroutine(cambiarColor());
             if(vidas > 1){
                 --vidas;
