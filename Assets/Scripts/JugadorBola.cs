@@ -34,6 +34,7 @@ public class JugadorBola : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1f;
         posicion_suelo = new Queue<Vector3>();
         offset = camara.transform.position - transform.position;
         CrearSueloInicial();
