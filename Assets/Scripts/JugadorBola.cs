@@ -33,22 +33,16 @@ public class JugadorBola : MonoBehaviour
     private int nivel2 = 200;
     private Material[] colores_suelo;
     private Color[] colores_fondo;
-    private Color fondo_actual;
-    private int nivel;
+
 
     // Start is called before the first frame update
     void Start()
     {
         Time.timeScale = 1f;
-        nivel = 1;
         posicion_suelo = new Queue<Vector3>();
         colores_suelo = new Material[3];
         colores_fondo = new Color[3];
         offset = camara.transform.position - transform.position;
-        CrearSueloInicial();
-        DireccionActual = Vector3.forward;
-        altura = transform.position.y;
-        rotacion = transform.eulerAngles;
         Vidas_texto.text = "x " + vidas;
         normal = GetComponent<Renderer>().material;
 
@@ -56,11 +50,18 @@ public class JugadorBola : MonoBehaviour
         colores_suelo[1] = Resources.Load("Materiales/Verde") as Material;
         colores_suelo[2] = Resources.Load("Materiales/Negro") as Material;
 
+        suelo.GetComponent<Renderer>().material = colores_suelo[0];
+
+        CrearSueloInicial();
+        DireccionActual = Vector3.forward;
+        altura = transform.position.y;
+        rotacion = transform.eulerAngles;
+
         colores_fondo[0] = new Color(20/255f,113/255f,207/255f);    //Azul
         colores_fondo[1] = new Color(161/255f,130/255f,98/255f);    //Cafe
         colores_fondo[2] = new Color(232/255f,220/255f,202/255f);   //Beige
 
-        fondo_actual = camara.backgroundColor = colores_fondo[0];
+        camara.backgroundColor = colores_fondo[0];
     }
 
     // Update is called once per frame
@@ -92,7 +93,7 @@ public class JugadorBola : MonoBehaviour
 
         if(Puntuacion == nivel2){
             NivelActual.text = "Nivel 2";
-            nivel = 2;
+            suelo.GetComponent<Renderer>().material = colores_suelo[1];
             camara.backgroundColor = colores_fondo[1];
         }
     }
@@ -157,7 +158,6 @@ public class JugadorBola : MonoBehaviour
         aleatorio = Random.Range(0.0f, 1.0f);
         posicion_suelo.Enqueue(new Vector3(ValX, 0, ValZ));
         Instantiate(suelo, new Vector3(ValX, 0, ValZ), Quaternion.identity);
-        suelo.GetComponent<Renderer>().material = colores_suelo[nivel-1];
         if(aleatorio > 0.5){
             Instantiate(moneda, new Vector3(ValX+monX, 1, ValZ+monZ), moneda.transform.rotation);
         }
