@@ -30,7 +30,8 @@ public class JugadorBola : MonoBehaviour
     private Vector3 rotacion;
     private int vidas = 3;
     private Queue<Vector3> posicion_suelo;
-    private int nivel2 = 200;
+    private int nivel2 = 50;
+    private int nivel3 = 100;
     private Material[] colores_suelo;
     private Color[] colores_fondo;
 
@@ -95,6 +96,10 @@ public class JugadorBola : MonoBehaviour
             NivelActual.text = "Nivel 2";
             suelo.GetComponent<Renderer>().material = colores_suelo[1];
             camara.backgroundColor = colores_fondo[1];
+        }else if(Puntuacion == nivel3){
+            NivelActual.text = "Nivel 3";
+            suelo.GetComponent<Renderer>().material = colores_suelo[2];
+            camara.backgroundColor = colores_fondo[2];
         }
     }
 
