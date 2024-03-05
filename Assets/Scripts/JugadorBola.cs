@@ -12,7 +12,7 @@ public class JugadorBola : MonoBehaviour
     public GameObject suelo;
     public GameObject moneda;
     public GameObject obstaculo;
-    public float velocidad = 5.0f;
+    public float velocidad;
     public TextMeshProUGUI Contador;
     public TextMeshProUGUI Vidas_texto;
     public TextMeshProUGUI NivelActual;
@@ -54,6 +54,7 @@ public class JugadorBola : MonoBehaviour
         suelo.GetComponent<Renderer>().material = colores_suelo[0];
 
         CrearSueloInicial();
+        velocidad = 10f;
         DireccionActual = Vector3.forward;
         altura = transform.position.y;
         rotacion = transform.eulerAngles;
@@ -98,6 +99,7 @@ public class JugadorBola : MonoBehaviour
             camara.backgroundColor = colores_fondo[1];
         }else if(Puntuacion == nivel3){
             NivelActual.text = "Nivel 3";
+            velocidad = 13f;
             suelo.GetComponent<Renderer>().material = colores_suelo[2];
             camara.backgroundColor = colores_fondo[2];
         }
@@ -210,6 +212,7 @@ public class JugadorBola : MonoBehaviour
     }
 
     void GameOver(){
+        suelo.GetComponent<Renderer>().material = colores_suelo[0];
         overMenuUI.SetActive(true);
         Time.timeScale = 0f;
     }

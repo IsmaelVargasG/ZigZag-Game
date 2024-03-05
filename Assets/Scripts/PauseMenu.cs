@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     public GameObject pauseMenuUI;
+    public GameObject suelo;
+    public Material colorSuelo;
 
     public void ResumeGame(){
         pauseMenuUI.SetActive(false);
@@ -13,6 +15,7 @@ public class PauseMenu : MonoBehaviour
     }
 
     public void Restart(){
+        suelo.GetComponent<Renderer>().material = colorSuelo;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1f;
     }
